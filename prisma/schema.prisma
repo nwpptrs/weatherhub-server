@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Location {
+  id           Int             @id @default(autoincrement())
+  name         String
+  lat          Float
+  lon          Float
+  timezone     String
+  weatherHourly WeatherHourly[]
+  weatherDaily  WeatherDaily[]
+}
+
+model WeatherHourly {
+  id           Int      @id @default(autoincrement())
+  timestamp    DateTime
+  temperature  Float
+  humidity     Float
+  windspeed    Float?
+  rain         Float?
+  condition    Int?      
+  location_id  Int
+  location     Location  @relation(fields: [location_id], references: [id])
+
+  @@unique([location_id, timestamp], name: "location_id_timestamp") 
+}
+
+model WeatherDaily {
+  id            Int      @id @default(autoincrement())
+  date          DateTime
+  temp_max      Float
+  temp_min      Float
+  rain_sum      Float
+  location_id   Int
+  location      Location  @relation(fields: [location_id], references: [id])
+  
+  @@unique([location_id, date], name: "location_id_date")
+}
